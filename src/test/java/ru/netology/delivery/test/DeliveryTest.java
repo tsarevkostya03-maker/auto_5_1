@@ -22,25 +22,50 @@ public class DeliveryTest {
 
     @BeforeAll
     static void setUpAll() {
-        WebDriverManager.firefoxdriver().setup();
+        System.out.println("=== НАЧАЛО НАСТРОЙКИ ===");
+        System.out.println("OS: " + System.getProperty("os.name"));
+        System.out.println("Java: " + System.getProperty("java.version"));
+
+        try {
+            WebDriverManager.firefoxdriver().setup();
+            System.out.println("WebDriverManager настроен успешно");
+        } catch (Exception e) {
+            System.out.println("Ошибка при настройке WebDriverManager: " + e.getMessage());
+            e.printStackTrace();
+            throw e;
+        }
     }
 
     @BeforeEach
     void setUp() {
-        FirefoxOptions options = new FirefoxOptions();
-        options.addArguments("--headless");
-        options.addArguments("--width=1920");
-        options.addArguments("--height=1080");
+        System.out.println("=== НАЧАЛО ТЕСТА ===");
 
-        driver = new FirefoxDriver(options);
-        driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(15));
-        driver.manage().window().maximize();
+        try {
+            FirefoxOptions options = new FirefoxOptions();
+            options.addArguments("--headless");
+            options.addArguments("--width=1920");
+            options.addArguments("--height=1080");
+
+            System.out.println("Создание FirefoxDriver...");
+            driver = new FirefoxDriver(options);
+            System.out.println("FirefoxDriver создан успешно");
+
+            driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(15));
+            driver.manage().window().maximize();
+            System.out.println("Настройки драйвера применены");
+
+        } catch (Exception e) {
+            System.out.println("ОШИБКА при создании драйвера: " + e.getMessage());
+            e.printStackTrace();
+            throw e;
+        }
     }
 
     @AfterEach
     void tearDown() {
         if (driver != null) {
             driver.quit();
+            System.out.println("Драйвер закрыт");
         }
     }
 

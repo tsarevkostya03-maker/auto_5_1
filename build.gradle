@@ -25,4 +25,9 @@ test {
     systemProperty "webdriver.http.factory", "jdk-http-client"
     systemProperty "selenium.webdriver.remote.enableWebDriverBidi", "false"
     systemProperty "file.encoding", "UTF-8"
+    testLogging {
+        events "passed", "skipped", "failed"
+        exceptionFormat "full"
+        showStandardStreams = true
+    }
 }
