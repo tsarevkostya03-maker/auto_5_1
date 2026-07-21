@@ -19,10 +19,10 @@ jobs:
           java-version: '11'
           distribution: 'temurin'
 
-      - name: Setup Chrome
-        uses: browser-actions/setup-chrome@v1
-        with:
-          chrome-version: 'stable'
+      - name: Install Firefox
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y firefox
 
       - name: Cache Gradle packages
         uses: actions/cache@v3
