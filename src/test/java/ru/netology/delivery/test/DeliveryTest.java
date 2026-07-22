@@ -9,8 +9,8 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.firefox.FirefoxDriver;
-import org.openqa.selenium.firefox.FirefoxOptions;
+import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.chrome.ChromeOptions;
 import ru.netology.delivery.data.DataGenerator;
 
 import java.time.Duration;
@@ -27,10 +27,10 @@ public class DeliveryTest {
         System.out.println("Java: " + System.getProperty("java.version"));
 
         try {
-            WebDriverManager.firefoxdriver().setup();
-            System.out.println("WebDriverManager настроен успешно");
+            WebDriverManager.chromedriver().setup();
+            System.out.println("ChromeDriver настроен успешно");
         } catch (Exception e) {
-            System.out.println("Ошибка при настройке WebDriverManager: " + e.getMessage());
+            System.out.println("Ошибка при настройке ChromeDriver: " + e.getMessage());
             e.printStackTrace();
             throw e;
         }
@@ -41,14 +41,17 @@ public class DeliveryTest {
         System.out.println("=== НАЧАЛО ТЕСТА ===");
 
         try {
-            FirefoxOptions options = new FirefoxOptions();
+            ChromeOptions options = new ChromeOptions();
             options.addArguments("--headless");
-            options.addArguments("--width=1920");
-            options.addArguments("--height=1080");
+            options.addArguments("--no-sandbox");
+            options.addArguments("--disable-dev-shm-usage");
+            options.addArguments("--disable-gpu");
+            options.addArguments("--window-size=1920,1080");
+            options.addArguments("--remote-allow-origins=*");
 
-            System.out.println("Создание FirefoxDriver...");
-            driver = new FirefoxDriver(options);
-            System.out.println("FirefoxDriver создан успешно");
+            System.out.println("Создание ChromeDriver...");
+            driver = new ChromeDriver(options);
+            System.out.println("ChromeDriver создан успешно");
 
             driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(15));
             driver.manage().window().maximize();
