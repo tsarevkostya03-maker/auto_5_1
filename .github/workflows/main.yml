@@ -42,17 +42,24 @@ jobs:
       - name: Make gradlew executable
         run: chmod +x gradlew
 
-      - name: Start SUT
+      - name: Start SUT with nohup
         run: |
           echo "Starting SUT..."
-          java -jar artifacts/app-card-delivery.jar &
-          echo "Waiting for SUT to start..."
+          pwd
+          ls -la artifacts/
+          nohup java -jar artifacts/app-card-delivery.jar > sut.log 2>&1 &
+          echo "SUT started with PID: $!"
           sleep 15
-          echo "Checking if SUT is running..."
-          curl -v http://localhost:9999 || echo "SUT not responding"
+          echo "SUT log:"
+          cat sut.log || echo "No log file"
+          echo "Checking port 9999..."
+          netstat -tulpn | grep 9999 || echo "Port 9999 not listening"
+          echo "Testing connection..."
+          curl -v http://localhost:9999 || echo "Curl failed"
 
       - name: Run tests
-        run: ./gradlew test
+        run: |
+          ./gradlew test
 
       - name: Upload test results
         if: always()
@@ -60,3 +67,10 @@ jobs:
         with:
           name: test-results
           path: build/reports/tests/test/
+
+      - name: Upload SUT logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: sut-logs
+          path: sut.log
