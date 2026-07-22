@@ -74,6 +74,27 @@ public class DeliveryTest {
 
     @Test
     void shouldReplanMeeting() {
+        // Проверяем, что SUT доступен
+        try {
+            driver.get("http://localhost:9999/");
+            System.out.println("SUT доступен");
+        } catch (Exception e) {
+            System.out.println("SUT НЕ ДОСТУПЕН! Ошибка: " + e.getMessage());
+            // Выводим информацию для диагностики
+            try {
+                Process process = Runtime.getRuntime().exec("ps aux | grep java");
+                try (java.io.BufferedReader reader = new java.io.BufferedReader(
+                        new java.io.InputStreamReader(process.getInputStream()))) {
+                    String line;
+                    while ((line = reader.readLine()) != null) {
+                        System.out.println("PROCESS: " + line);
+                    }
+                }
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
+            throw e;
+        }
         DataGenerator.UserInfo user = DataGenerator.Registration.generateUser();
         String firstDate = DataGenerator.generateDate(3);
         String secondDate = DataGenerator.generateDate(5);

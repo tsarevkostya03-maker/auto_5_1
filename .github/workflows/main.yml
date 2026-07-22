@@ -44,8 +44,12 @@ jobs:
 
       - name: Start SUT
         run: |
+          echo "Starting SUT..."
           java -jar artifacts/app-card-delivery.jar &
-          sleep 10
+          echo "Waiting for SUT to start..."
+          sleep 15
+          echo "Checking if SUT is running..."
+          curl -v http://localhost:9999 || echo "SUT not responding"
 
       - name: Run tests
         run: ./gradlew test
