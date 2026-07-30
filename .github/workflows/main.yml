@@ -20,9 +20,21 @@ jobs:
 
       - name: Start SUT
         run: |
+          # Запускаем SUT в фоне
           java -jar ./artifacts/app-mbank.jar &
-          sleep 10
-          curl -s http://localhost:9999/ || echo "SUT is starting..."
+          # Даём время на старт
+          sleep 5
+          # Проверяем, что SUT действительно запустился и отвечает
+          for i in {1..20}; do
+            if curl -s http://localhost:9999/ > /dev/null; then
+              echo "✅ SUT is ready! (attempt $i)"
+              exit 0
+            fi
+            echo "⏳ Waiting for SUT... (attempt $i/20)"
+            sleep 2
+          done
+          echo "❌ SUT failed to start after 40 seconds"
+          exit 1
 
       - name: Run tests
         run: ./gradlew test --info -Dselenide.headless=true
