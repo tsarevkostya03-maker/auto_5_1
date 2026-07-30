@@ -1,6 +1,6 @@
 # Delivery Test Automation
 
-[![Java CI with Selenium](https://github.com/ВАШ-USERNAME/ВАШ-РЕПОЗИТОРИЙ/actions/workflows/main.yml/badge.svg)](https://github.com/ВАШ-USERNAME/ВАШ-РЕПОЗИТОРИЙ/actions/workflows/main.yml)
+[![Java CI with Gradle](https://github.com/tsarevkostya03-maker/auto_5_1/actions/workflows/main.yml/badge.svg)](https://github.com/tsarevkostya03-maker/auto_5_1/actions/workflows/main.yml)
 
 ## Описание
 
