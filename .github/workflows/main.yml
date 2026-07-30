@@ -18,13 +18,14 @@ jobs:
       - name: Make gradlew executable
         run: chmod +x gradlew
 
+      - name: Check artifacts folder
+        run: ls -la artifacts/
+
       - name: Start SUT
         run: |
-          # Запускаем SUT в фоне
-          java -jar ./artifacts/app-mbank.jar &
-          # Даём время на старт
+          # Используем правильное имя файла (app-replan-delivery.jar)
+          java -jar ./artifacts/app-replan-delivery.jar &
           sleep 5
-          # Проверяем, что SUT действительно запустился и отвечает
           for i in {1..20}; do
             if curl -s http://localhost:9999/ > /dev/null; then
               echo "✅ SUT is ready! (attempt $i)"
