@@ -14,10 +14,11 @@ jobs:
           java-version: '11'
           distribution: 'temurin'
 
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+
       - name: Start SUT
-        run: |
-          java -jar ./artifacts/app-mbank.jar &
-          sleep 5
+        run: java -jar ./artifacts/app-card-delivery.jar &
 
       - name: Run tests
         run: ./gradlew test --info -Dselenide.headless=true
