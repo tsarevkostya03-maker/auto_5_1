@@ -1,8 +1,11 @@
 package ru.netology.delivery;
 
 import com.codeborne.selenide.Condition;
+import com.codeborne.selenide.Configuration;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
+import java.time.Duration;
 
 import static com.codeborne.selenide.Selenide.*;
 
@@ -10,6 +13,8 @@ public class DeliveryTest {
 
     @BeforeEach
     void setUp() {
+        // Настройка таймаута
+        Configuration.timeout = 15000; // 15 секунд
         // Открываем страницу с формой заявки
         open("http://localhost:9999/");
     }
@@ -33,7 +38,7 @@ public class DeliveryTest {
         $$("button").find(Condition.exactText("Забронировать")).click();
 
         // Проверяем успешное уведомление
-        $("[data-test-id='success-notification']").shouldBe(Condition.visible, 15000);
+        $("[data-test-id='success-notification']").shouldBe(Condition.visible);
         $("[data-test-id='success-notification'] .notification__content")
                 .shouldHave(Condition.exactText("Встреча успешно забронирована на " + date));
     }
