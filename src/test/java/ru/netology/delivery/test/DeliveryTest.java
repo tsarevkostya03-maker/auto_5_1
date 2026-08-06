@@ -16,7 +16,7 @@ public class DeliveryTest {
         // Настройка таймаута
         Configuration.timeout = 15000; // 15 секунд
         // Открываем страницу с формой заявки
-        open("http://localhost:9999/")
+        open("http://localhost:9999/");
     }
 
     @Test
