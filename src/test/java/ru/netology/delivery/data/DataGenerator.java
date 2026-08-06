@@ -1,4 +1,4 @@
-package ru.netology.delivery;
+package ru.netology.delivery.data;
 
 import com.github.javafaker.Faker;
 import java.time.LocalDate;
