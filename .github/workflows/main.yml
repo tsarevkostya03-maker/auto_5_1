@@ -18,10 +18,21 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
+      - name: List artifacts (для отладки)
+        run: ls -la artifacts/
+
       - name: Start SUT
         run: |
           java -jar ./artifacts/app-card-delivery.jar &
-          sleep 15
+          echo "Waiting for SUT..."
+          for i in {1..30}; do
+            if curl -s http://localhost:9999/ > /dev/null; then
+              echo "SUT is ready!"
+              break
+            fi
+            echo "Attempt $i: SUT not ready..."
+            sleep 1
+          done
 
       - name: Run tests
         run: ./gradlew test --info -Dselenide.headless=true
