@@ -19,7 +19,9 @@ jobs:
         run: chmod +x gradlew
 
       - name: Start SUT
-        run: java -jar ./artifacts/app-card-delivery.jar &
+        run: |
+          java -jar ./artifacts/app-card-delivery.jar &
+          sleep 10
 
       - name: Run tests
         run: ./gradlew test --info -Dselenide.headless=true
