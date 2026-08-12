@@ -20,10 +20,17 @@ jobs:
 
       - name: Start SUT
         run: |
+          echo "Starting SUT..."
           java -jar ./artifacts/app-card-delivery.jar &
-          sleep 15
-          curl -s -o /dev/null -w "%{http_code}" http://localhost:9999/ || echo "SUT not ready yet"
-          sleep 5
+          echo "Waiting for SUT to start..."
+          for i in {1..30}; do
+            if curl -s http://localhost:9999/ > /dev/null; then
+              echo "SUT is ready!"
+              break
+            fi
+            echo "Attempt $i: SUT not ready yet..."
+            sleep 1
+          done
 
       - name: Run tests
         run: ./gradlew test --info -Dselenide.headless=true
