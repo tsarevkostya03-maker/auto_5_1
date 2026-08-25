@@ -1,218 +1,57 @@
 package ru.netology.delivery.test;
 
-import io.github.bonigarcia.wdm.WebDriverManager;
-import org.junit.jupiter.api.AfterEach;
+import com.codeborne.selenide.Condition;
+import com.codeborne.selenide.logevents.SelenideLogger;
+import io.qameta.allure.selenide.AllureSelenide;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.openqa.selenium.By;
-import org.openqa.selenium.Keys;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
-import org.openqa.selenium.chrome.ChromeDriver;
-import org.openqa.selenium.chrome.ChromeOptions;
 import ru.netology.delivery.data.DataGenerator;
 
-import java.time.Duration;
-
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static com.codeborne.selenide.Selenide.*;
 
 public class DeliveryTest {
-    private WebDriver driver;
 
     @BeforeAll
     static void setUpAll() {
-        System.out.println("=== НАЧАЛО НАСТРОЙКИ ===");
-        System.out.println("OS: " + System.getProperty("os.name"));
-        System.out.println("Java: " + System.getProperty("java.version"));
-
-        try {
-            WebDriverManager.chromedriver().setup();
-            System.out.println("ChromeDriver настроен успешно");
-        } catch (Exception e) {
-            System.out.println("Ошибка при настройке ChromeDriver: " + e.getMessage());
-            e.printStackTrace();
-            throw e;
-        }
+        // Добавляем слушатель Allure для автоматического логирования шагов и скриншотов
+        SelenideLogger.addListener("allure", new AllureSelenide()
+                .screenshots(true)      // делать скриншоты при каждом шаге
+                .savePageSource(true)); // сохранять HTML страницы при ошибках
     }
 
     @BeforeEach
     void setUp() {
-        System.out.println("=== НАЧАЛО ТЕСТА ===");
-
-        try {
-            ChromeOptions options = new ChromeOptions();
-            options.addArguments("--headless");
-            options.addArguments("--no-sandbox");
-            options.addArguments("--disable-dev-shm-usage");
-            options.addArguments("--disable-gpu");
-            options.addArguments("--window-size=1920,1080");
-            options.addArguments("--remote-allow-origins=*");
-
-            System.out.println("Создание ChromeDriver...");
-            driver = new ChromeDriver(options);
-            System.out.println("ChromeDriver создан успешно");
-
-            driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(15));
-            driver.manage().window().maximize();
-            System.out.println("Настройки драйвера применены");
-
-        } catch (Exception e) {
-            System.out.println("ОШИБКА при создании драйвера: " + e.getMessage());
-            e.printStackTrace();
-            throw e;
-        }
-    }
-
-    @AfterEach
-    void tearDown() {
-        if (driver != null) {
-            driver.quit();
-            System.out.println("Драйвер закрыт");
-        }
+        open("http://localhost:9999/");
     }
 
     @Test
-    void shouldReplanMeeting() {
-        // Проверяем, что SUT доступен
-        try {
-            driver.get("http://localhost:9999/");
-            System.out.println("SUT доступен");
-        } catch (Exception e) {
-            System.out.println("SUT НЕ ДОСТУПЕН! Ошибка: " + e.getMessage());
-            // Выводим информацию для диагностики
-            try {
-                Process process = Runtime.getRuntime().exec("ps aux | grep java");
-                try (java.io.BufferedReader reader = new java.io.BufferedReader(
-                        new java.io.InputStreamReader(process.getInputStream()))) {
-                    String line;
-                    while ((line = reader.readLine()) != null) {
-                        System.out.println("PROCESS: " + line);
-                    }
-                }
-            } catch (Exception ex) {
-                ex.printStackTrace();
-            }
-            throw e;
-        }
-        DataGenerator.UserInfo user = DataGenerator.Registration.generateUser();
-        String firstDate = DataGenerator.generateDate(3);
-        String secondDate = DataGenerator.generateDate(5);
+    void shouldSubmitValidDeliveryRequest() {
+        // Шаг Allure
+        SelenideLogger.step("Генерация тестовых данных", () -> {
+            String city = DataGenerator.generateCity();
+            String name = DataGenerator.generateName();
+            String phone = DataGenerator.generatePhone();
+            String date = DataGenerator.generateDate(3);
 
-        System.out.println("Пользователь: " + user.getName() + ", " + user.getPhone());
-        System.out.println("Первая дата: " + firstDate);
-        System.out.println("Вторая дата: " + secondDate);
+            // Шаг Allure внутри шага
+            SelenideLogger.step("Заполнение формы", () -> {
+                $("[data-test-id='city'] input").setValue(city);
+                $("[data-test-id='date'] input").doubleClick().sendKeys(date);
+                $("[data-test-id='name'] input").setValue(name);
+                $("[data-test-id='phone'] input").setValue(phone);
+                $("[data-test-id='agreement']").click();
+            });
 
-        driver.get("http://localhost:9999/");
-        sleep(1000);
+            SelenideLogger.step("Отправка формы", () -> {
+                $$("button").find(Condition.exactText("Запланировать")).click();
+            });
 
-        fillForm(user.getCity(), firstDate, user.getName(), user.getPhone());
-        clickButton();
-        sleep(2000);
-
-        checkAnyNotification();
-
-        changeDate(secondDate);
-        clickButton();
-        sleep(2000);
-
-        checkAnyNotification();
-    }
-
-    private void fillForm(String city, String date, String name, String phone) {
-        try {
-            WebElement cityInput = driver.findElement(By.cssSelector("[data-test-id='city'] input"));
-            cityInput.clear();
-            cityInput.sendKeys(city);
-            System.out.println("Введен город: " + city);
-            sleep(300);
-
-            WebElement dateInput = driver.findElement(By.cssSelector("[data-test-id='date'] input"));
-            dateInput.clear();
-            dateInput.sendKeys(date);
-            System.out.println("Введена дата: " + date);
-            sleep(300);
-
-            WebElement nameInput = driver.findElement(By.cssSelector("[data-test-id='name'] input"));
-            nameInput.clear();
-            nameInput.sendKeys(name);
-            System.out.println("Введено имя: " + name);
-            sleep(300);
-
-            WebElement phoneInput = driver.findElement(By.cssSelector("[data-test-id='phone'] input"));
-            phoneInput.clear();
-            phoneInput.sendKeys(phone);
-            System.out.println("Введен телефон: " + phone);
-            sleep(300);
-
-            WebElement agreement = driver.findElement(By.cssSelector("[data-test-id='agreement']"));
-            if (!agreement.isSelected()) {
-                agreement.click();
-                System.out.println("Отмечено согласие");
-            }
-            sleep(300);
-
-        } catch (Exception e) {
-            System.out.println("Ошибка при заполнении формы: " + e.getMessage());
-            throw e;
-        }
-    }
-
-    private void changeDate(String newDate) {
-        WebElement dateInput = driver.findElement(By.cssSelector("[data-test-id='date'] input"));
-        dateInput.clear();
-        dateInput.sendKeys(newDate);
-        System.out.println("Дата изменена на: " + newDate);
-        sleep(500);
-    }
-
-    private void clickButton() {
-        try {
-            WebElement button = driver.findElement(By.cssSelector(".button"));
-            button.click();
-            System.out.println("Кнопка нажата");
-            sleep(2000);
-        } catch (Exception e) {
-            System.out.println("Не удалось найти кнопку: " + e.getMessage());
-            throw e;
-        }
-    }
-
-    private void checkAnyNotification() {
-        try {
-            String[] selectors = {
-                    "[data-test-id='success-notification']",
-                    "[data-test-id='replan-notification']",
-                    ".notification",
-                    ".notification__content",
-                    "[class*='notification']"
-            };
-
-            for (String selector : selectors) {
-                try {
-                    WebElement element = driver.findElement(By.cssSelector(selector));
-                    if (element.isDisplayed()) {
-                        String text = element.getText();
-                        System.out.println("Найдено уведомление по селектору '" + selector + "': " + text);
-                        return;
-                    }
-                } catch (Exception e) {
-                    // Игнорируем
-                }
-            }
-
-            System.out.println("Уведомление не найдено");
-
-        } catch (Exception e) {
-            System.out.println("Ошибка при поиске уведомления: " + e.getMessage());
-        }
-    }
-
-    private void sleep(int millis) {
-        try {
-            Thread.sleep(millis);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+            SelenideLogger.step("Проверка успешного уведомления", () -> {
+                $("[data-test-id='success-notification']").shouldBe(Condition.visible);
+                $("[data-test-id='success-notification'] .notification__content")
+                        .shouldHave(Condition.exactText("Встреча успешно запланирована на " + date));
+            });
+        });
     }
 }
