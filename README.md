@@ -6,3 +6,21 @@
 
 ```bash
 java -jar ./artifacts/app-card-delivery.jar
+
+## Скриншоты отчетов Allure
+
+### Общий отчет (Overview)
+
+https://photos.app.goo.gl/KB5WdpkDF627FExv7
+
+### Графики (Graphs)
+
+https://photos.app.goo.gl/Q5Qso7BroV4q4pUc9
+
+### Детали тестов (Suites)
+
+https://photos.app.goo.gl/uWTSJa26yvDvGw2E7
+
+### Поведение (Behaviors)
+
+https://photos.app.goo.gl/FodF2qQUyEZBiGGg9
